@@ -1,0 +1,9 @@
+Wan2.1_VAE.pth
+models_t5_umt5-xxl-enc-bf16.pth
+diffusion_pytorch_model.safetensors
+config.json
+configuration.json
+google/umt5-xxl/special_tokens_map.json
+google/umt5-xxl/spiece.model
+google/umt5-xxl/tokenizer.json
+google/umt5-xxl/tokenizer_config.json

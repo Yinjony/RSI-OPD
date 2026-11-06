@@ -1,0 +1,70 @@
+# Use: bash Wan21/scripts/train.sh guider2 / bash Wan21/scripts/infer.sh guider2
+# gpus: explicit selection; availability is not auto-detected. Accumulation is derived from effective_batch_size.
+# relora: false preserves initial_adapter A/B; true merges once at phase start and initializes new A/B.
+# anchor: true adds a frozen phase-start reference loss; false uses supervised SFT only.
+gpus:
+- 2
+- 3
+effective_batch_size: 4
+attribute_dropout: true
+relora: false
+anchor: true
+annotation_path: /root/data/yizeli/PycharmProjects/MinWM_agent/runs/iteration001_replay_new/Guider_2_new.json
+generator_ckpt: /root/data/mcy/timeOPD/minWM/ckpts/Wan21/Action2V/dmd/model.pt
+initial_adapter: null  # original DMD + fresh LoRA; no previous-round adapter
+model_path: /root/data/mcy/timeOPD/minWM/Wan21/wan_models/Wan2.1-T2V-1.3B
+cache_dir: dataset/Wan21/Action2V/guider_sft_iter2_replay_attribute_dropout
+output_dir: logs/Wan21/Action2V/guider2_replay_20step_attribute_dropout
+resume: null
+lora_rank: 64
+lora_alpha: 64
+lora_dropout: 0.0
+lora_target_modules:
+- q
+- k
+- v
+- o
+- prope_o
+num_frames: 77
+height: 480
+width: 832
+num_frame_per_block: 4
+timestep_shift: 5.0
+camera:
+  fx: 0.5050505
+  fy: 0.89786756
+  cx: 0.5
+  cy: 0.5
+loss_weighting: uniform
+anchor_eta: 0.1
+denoising_step_list: [1000, 950, 900, 850, 800, 750, 700, 650, 600, 550, 500, 450, 400, 350, 300, 250, 200, 150, 100, 50]
+warp_denoising_step: true
+anchor_denoising_step_list: ${denoising_step_list}
+anchor_warp_denoising_step: ${warp_denoising_step}
+anchor_states_per_batch: 1
+anchor_cache_device: cuda
+lr: 1.0e-05
+beta1: 0.9
+beta2: 0.999
+weight_decay: 0.0
+warmup_steps: 20
+max_grad_norm: 1.0
+batch_size: 1
+max_steps: 1425
+gradient_checkpointing: true
+num_workers: 0
+seed: 42
+val_fraction: 0.05
+split_seed: 42
+validation_controls: true
+val_seed: 12345
+val_every: 475
+save_every: 238
+log_every: 1
+inference:
+  checkpoint: /root/data/ltl/timeOPD/minWM/logs/Wan21/Action2V/guider_sft_iter2_continue_guider1_lora64_anchor/checkpoint_001425/model.pt
+  num_samples: 10
+  base_seed: 0
+  fps: 16
+  validation_config: Wan21/configs/guider2.yaml
+  guidance_scale: 2.0

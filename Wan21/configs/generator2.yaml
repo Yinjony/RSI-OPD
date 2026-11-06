@@ -1,0 +1,84 @@
+# Use: bash Wan21/scripts/train.sh generator2 / bash Wan21/scripts/infer.sh generator2
+# gpus: explicit selection; availability is not auto-detected. Accumulation is derived from effective_batch_size.
+# relora: false preserves initial_adapter A/B; true merges once at phase start and initializes new A/B.
+gpus:
+- 2
+- 3
+effective_batch_size: 4
+relora: false
+generator_ckpt: /root/data/mcy/timeOPD/minWM/ckpts/Wan21/Action2V/dmd/model.pt
+generator_checkpoint_key: generator
+initial_adapter: /root/data/mcy/timeOPD/minWM/logs/Wan21/Action2V/biopd_guider1425_selector_iter1_lora64_4gpu_kv_20261003_022035/step_0000475/adapter
+guider_ckpt: /root/data/ltl/timeOPD/minWM/logs/Wan21/Action2V/guider_sft_iter2_continue_guider1_lora64_anchor/checkpoint_001425/model.pt
+guider_checkpoint_key: generator
+guider_adapter_ckpt: null
+model_path: /root/data/mcy/timeOPD/minWM/Wan21/wan_models/Wan2.1-T2V-1.3B
+annotation_path: /root/data/mcy/timeOPD/minWM/dataset/selector_iter2.json
+split_manifest: /root/data/mcy/timeOPD/minWM/dataset/Wan21/Action2V/guider_sft_iter2/manifest.json
+dataset_split: train
+missing_attributes: keep
+condition_format: guider_sft
+prompt_attribute_template: '{prompt}
+
+  Attributes: {attributes}'
+attribute_only_template: 'Attributes: {attributes}'
+attribute_separator: '; '
+camera:
+  fx: 0.5050505
+  fy: 0.89786756
+  cx: 0.5
+  cy: 0.5
+denoising_step_list: [1000, 950, 900, 850, 800, 750, 700, 650, 600, 550, 500, 450, 400, 350, 300, 250, 200, 150, 100, 50]
+warp_denoising_step: true
+timestep_shift: 5.0
+num_training_frames: 20
+num_frame_per_block: 4
+latent_height: 60
+latent_width: 104
+local_attn_size: 20
+biopd_lambda: 0.25
+omega_positive: 1.0
+omega_negative: 1.0
+guider_branch_batch_size: 4
+guider_text_kv_cache: true
+prope_transform_cache: true
+guider_video_kv_buffer: true
+step_weights: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+lora_rank: 64
+lora_alpha: 64
+lora_target_modules:
+- q
+- k
+- v
+- o
+- prope_o
+gradient_checkpointing: true
+cache_device: cuda
+text_encoder_offload: true
+text_cache_dir: /root/data/mcy/timeOPD/minWM/dataset/Wan21/Action2V/biopd_selector_iter2
+text_cache_size: 128
+batch_size: 1
+lr: 2.0e-06
+beta1: 0.9
+beta2: 0.999
+weight_decay: 0.0
+max_grad_norm: 1.0
+seed: 42
+max_steps: 475
+log_every: 1
+save_every: 100
+val_every: 100
+val_at_start: true
+val_num_samples: 20
+val_full_at_end: true
+val_seed: 12345
+save_merged: true
+output_dir: logs/Wan21/Action2V/generator2_20step
+resume: null
+inference:
+  checkpoint: /root/data/ltl/timeOPD/minWM/logs/Wan21/Action2V/biopd_iter2_continue_g1adapter_guider1_anchor1425_selector_iter2_lora64_2gpu_kv_20261017_014636/step_0000475/model.pt
+  num_samples: 10
+  base_seed: 0
+  fps: 16
+  prompts: /root/data/mcy/timeOPD/minWM/dataset/RSI_BiOPD_4000_prompts.txt
+  trajectories: /root/data/mcy/timeOPD/minWM/dataset/RSI_BiOPD_4000_trajectories.txt
